@@ -1,18 +1,15 @@
 export interface ShippingRate {
   id: string;
-  name: string;
-  description: string;
+  nameJa: string;
+  descriptionJa: string;
   price: number;
-  estimatedDays: string;
+  estimatedDaysJa: string;
 }
 
-// First 3 digits of postcode → local delivery zone
-// Replace with your actual area postcodes
+// 甲府市・山梨県内の主要郵便番号（ローカル配達エリア）
 const LOCAL_POSTCODES = [
-  '100','101','102','103','104','105','106','107','108','109',
-  '110','111','112','113','114','115','116','150','151','152',
-  '153','154','155','156','160','161','162','163','164',
-  '165','166','167','168','169','170','171','172','173',
+  '400', '401', '402', '403', '404', '405', '406', '407', '408', '409',
+  '410', '411', '412', '413', '414', '415',
 ];
 
 export function getShippingRates(postcode: string, country: string, subtotal: number): ShippingRate[] {
@@ -25,28 +22,28 @@ export function getShippingRates(postcode: string, country: string, subtotal: nu
   if (isLocal) {
     rates.push({
       id: 'local',
-      name: 'Local Delivery',
-      description: 'Hand-delivered by us',
+      nameJa: '手渡し配達（山梨県内）',
+      descriptionJa: 'スタッフが直接お届けします',
       price: subtotal >= FREE_THRESHOLD ? 0 : 300,
-      estimatedDays: 'Same or next day',
+      estimatedDaysJa: '当日〜翌日',
     });
   }
 
   rates.push({
     id: 'standard',
-    name: 'Standard',
-    description: country === 'JP' ? 'Japan Post' : 'International post',
-    price: subtotal >= FREE_THRESHOLD ? 0 : country === 'JP' ? 550 : 2000,
-    estimatedDays: country === 'JP' ? '2–4 days' : '7–14 days',
+    nameJa: country === 'JP' ? '通常配送（ゆうパック）' : '国際通常便',
+    descriptionJa: country === 'JP' ? '日本郵便' : '国際郵便',
+    price: subtotal >= FREE_THRESHOLD ? 0 : country === 'JP' ? 600 : 2500,
+    estimatedDaysJa: country === 'JP' ? '2〜4営業日' : '7〜14営業日',
   });
 
   if (country === 'JP') {
     rates.push({
       id: 'express',
-      name: 'Express',
-      description: 'Yamato next day',
+      nameJa: '速達配送（ヤマト宅急便）',
+      descriptionJa: '翌日お届け',
       price: 900,
-      estimatedDays: 'Next day',
+      estimatedDaysJa: '翌営業日',
     });
   }
 
@@ -54,7 +51,7 @@ export function getShippingRates(postcode: string, country: string, subtotal: nu
 }
 
 export const COUNTRIES = [
-  { code: 'JP', name: 'Japan' },
+  { code: 'JP', name: '日本' },
   { code: 'AU', name: 'Australia' },
   { code: 'US', name: 'United States' },
   { code: 'GB', name: 'United Kingdom' },
@@ -62,12 +59,11 @@ export const COUNTRIES = [
   { code: 'NZ', name: 'New Zealand' },
   { code: 'SG', name: 'Singapore' },
   { code: 'HK', name: 'Hong Kong' },
-  { code: 'KR', name: 'South Korea' },
-  { code: 'TW', name: 'Taiwan' },
+  { code: 'KR', name: '韓国' },
+  { code: 'TW', name: '台湾' },
   { code: 'DE', name: 'Germany' },
   { code: 'FR', name: 'France' },
   { code: 'NL', name: 'Netherlands' },
   { code: 'SE', name: 'Sweden' },
-  { code: 'NO', name: 'Norway' },
   { code: 'CH', name: 'Switzerland' },
 ];

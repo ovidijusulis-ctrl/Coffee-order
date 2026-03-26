@@ -14,9 +14,12 @@ const paypalId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || 'test';
 const stripePromise = stripeKey ? loadStripe(stripeKey) : null;
 
 interface Details {
-  firstName: string; lastName: string; email: string; phone: string;
-  address1: string; address2: string; city: string; state: string;
-  postcode: string; country: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  fullAddress: string;
+  postcode: string;
+  country: string;
 }
 
 interface Props {
@@ -33,16 +36,24 @@ interface Props {
 const CARD_STYLE = {
   style: {
     base: {
-      fontSize: '14px', color: '#1a1c1c', fontFamily: 'Inter, sans-serif',
-      '::placeholder': { color: '#aaa' },
+      fontSize: '14px', color: '#f0efef',
+      fontFamily: 'Inter, system-ui, sans-serif',
+      '::placeholder': { color: '#666' },
+      backgroundColor: 'transparent',
     },
-    invalid: { color: '#ba1a1a' },
+    invalid: { color: '#ff7070' },
   },
 };
 
-const INPUT_BOX: React.CSSProperties = {
+const CARD_BOX: React.CSSProperties = {
   padding: '12px', border: '1px solid var(--border)',
-  background: 'var(--surface)', marginBottom: '0',
+  background: 'var(--surface-low)',
+};
+
+const LABEL: React.CSSProperties = {
+  fontSize: '10px', textTransform: 'uppercase' as const,
+  letterSpacing: '0.12em', fontWeight: 600,
+  display: 'block', marginBottom: '6px', color: 'var(--text-muted)',
 };
 
 function StripeForm({ total, details, onConfirmed }: { total: number; details: Details; onConfirmed: () => void }) {
@@ -61,30 +72,22 @@ function StripeForm({ total, details, onConfirmed }: { total: number; details: D
       const res = await fetch(`${apiBase}/api/create-payment-intent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: Math.round(total * 100), currency: 'jpy', email: details.email }),
+        body: JSON.stringify({ amount: total, currency: 'jpy', email: details.email }),
       });
-      if (!res.ok) throw new Error('Payment server not available. Deploy to Vercel or a Node.js host to enable live payments.');
+      if (!res.ok) throw new Error('決済サーバーに接続できません。Vercelなどのサーバー環境でご利用ください。');
       const { clientSecret } = await res.json();
       const cardEl = elements.getElement(CardNumberElement);
-      if (!cardEl) throw new Error('Card element missing');
+      if (!cardEl) throw new Error('カード入力欄が見つかりません');
       const { error: se, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card: cardEl,
-          billing_details: {
-            name: `${details.firstName} ${details.lastName}`,
-            email: details.email,
-            address: {
-              line1: details.address1, line2: details.address2,
-              city: details.city, state: details.state,
-              postal_code: details.postcode, country: details.country,
-            },
-          },
+          billing_details: { name: details.fullName, email: details.email },
         },
       });
-      if (se) setError(se.message || 'Payment failed');
+      if (se) setError(se.message || '決済に失敗しました');
       else if (paymentIntent?.status === 'succeeded') onConfirmed();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Payment failed');
+      setError(err instanceof Error ? err.message : '決済に失敗しました');
     } finally {
       setLoading(false);
     }
@@ -93,35 +96,33 @@ function StripeForm({ total, details, onConfirmed }: { total: number; details: D
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
       <div>
-        <label style={{ fontSize: '10px', textTransform: 'uppercase' as const, letterSpacing: '0.15em', fontWeight: 600, display: 'block', marginBottom: '6px', color: 'var(--text-muted)' }}>
-          Card Number
-        </label>
-        <div style={INPUT_BOX}><CardNumberElement options={CARD_STYLE} /></div>
+        <label style={LABEL}>カード番号</label>
+        <div style={CARD_BOX}><CardNumberElement options={CARD_STYLE} /></div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
         <div>
-          <label style={{ fontSize: '10px', textTransform: 'uppercase' as const, letterSpacing: '0.15em', fontWeight: 600, display: 'block', marginBottom: '6px', color: 'var(--text-muted)' }}>Expiry</label>
-          <div style={INPUT_BOX}><CardExpiryElement options={CARD_STYLE} /></div>
+          <label style={LABEL}>有効期限</label>
+          <div style={CARD_BOX}><CardExpiryElement options={CARD_STYLE} /></div>
         </div>
         <div>
-          <label style={{ fontSize: '10px', textTransform: 'uppercase' as const, letterSpacing: '0.15em', fontWeight: 600, display: 'block', marginBottom: '6px', color: 'var(--text-muted)' }}>CVC</label>
-          <div style={INPUT_BOX}><CardCvcElement options={CARD_STYLE} /></div>
+          <label style={LABEL}>セキュリティコード</label>
+          <div style={CARD_BOX}><CardCvcElement options={CARD_STYLE} /></div>
         </div>
       </div>
       {error && (
-        <div style={{ padding: '10px 12px', background: '#fff0f0', border: '1px solid #f5c6c6', fontSize: '12px', color: '#ba1a1a' }}>
+        <div style={{ padding: '10px 12px', background: 'rgba(255,112,112,0.1)', border: '1px solid rgba(255,112,112,0.3)', fontSize: '12px', color: '#ff7070', lineHeight: 1.5 }}>
           {error}
         </div>
       )}
       <button type="submit" disabled={!stripe || loading} style={{
-        padding: '18px', background: 'var(--primary)', color: 'var(--on-primary)',
-        border: 'none', fontSize: '12px', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase',
-        opacity: loading ? 0.7 : 1,
+        padding: '17px', background: 'var(--primary)', color: 'var(--on-primary)',
+        border: 'none', fontSize: '13px', fontWeight: 700, letterSpacing: '0.12em',
+        opacity: loading ? 0.7 : 1, transition: 'opacity 0.2s',
       }}>
-        {loading ? 'Processing...' : `Pay ¥${total.toLocaleString()}`}
+        {loading ? '処理中...' : `¥${total.toLocaleString()} を支払う`}
       </button>
       <p style={{ textAlign: 'center', fontSize: '10px', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
-        🔒 Secured by Stripe
+        🔒 Stripeによる安全な決済
       </p>
     </form>
   );
@@ -130,48 +131,51 @@ function StripeForm({ total, details, onConfirmed }: { total: number; details: D
 export default function CheckoutPayment({ details, shippingRates, selectedRate, onSelectRate, subtotal, total, onBack, onConfirmed }: Props) {
   const [method, setMethod] = useState<'card' | 'paypal'>('card');
 
-  const tabBtn = (active: boolean): React.CSSProperties => ({
+  const tabStyle = (active: boolean): React.CSSProperties => ({
     flex: 1, padding: '12px', background: 'none',
     borderBottom: `2px solid ${active ? 'var(--primary)' : 'var(--border-light)'}`,
     borderTop: 'none', borderLeft: 'none', borderRight: 'none',
-    fontSize: '11px', fontWeight: active ? 700 : 400,
-    letterSpacing: '0.15em', textTransform: 'uppercase',
-    color: active ? 'var(--primary)' : 'var(--text-muted)',
+    fontSize: '12px', fontWeight: active ? 700 : 400,
+    letterSpacing: '0.1em', color: active ? 'var(--text)' : 'var(--text-muted)',
     transition: 'all 0.15s',
   });
 
   return (
     <div>
       <button onClick={onBack} style={{
-        background: 'none', border: 'none', fontSize: '11px',
-        letterSpacing: '0.1em', textTransform: 'uppercase',
-        color: 'var(--text-muted)', padding: '4px 0', marginBottom: '20px',
-      }}>
-        ← Details
-      </button>
-      <h2 style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: '28px', marginBottom: '28px' }}>
-        Payment
+        background: 'none', border: 'none', fontSize: '12px',
+        letterSpacing: '0.08em', color: 'var(--text-muted)', padding: '4px 0', marginBottom: '20px',
+      }}>← 配送先に戻る</button>
+
+      <h2 style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: '26px', marginBottom: '24px' }}>
+        お支払い
       </h2>
 
       {/* Shipping method */}
       {shippingRates.length > 0 && (
-        <div style={{ marginBottom: '28px' }}>
-          <p style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 600, marginBottom: '10px', color: 'var(--text-muted)' }}>
-            Delivery
-          </p>
+        <div style={{ marginBottom: '24px' }}>
+          <p style={{
+            fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.12em',
+            fontWeight: 600, marginBottom: '10px', color: 'var(--text-muted)',
+          }}>配送方法</p>
           {shippingRates.map(rate => (
             <button key={rate.id} onClick={() => onSelectRate(rate)} style={{
               width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              padding: '14px 16px', marginBottom: '6px', background: 'none',
+              padding: '13px 14px', marginBottom: '6px',
+              background: selectedRate?.id === rate.id ? 'var(--surface-container)' : 'var(--surface-low)',
               border: `1px solid ${selectedRate?.id === rate.id ? 'var(--primary)' : 'var(--border)'}`,
-              textAlign: 'left', transition: 'border-color 0.15s',
+              textAlign: 'left', transition: 'all 0.15s',
             }}>
               <div>
-                <p style={{ fontSize: '13px', fontWeight: 600, marginBottom: '2px' }}>{rate.name}</p>
-                <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{rate.description} · {rate.estimatedDays}</p>
+                <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text)', marginBottom: '2px' }}>
+                  {rate.nameJa}
+                </p>
+                <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                  {rate.descriptionJa} · {rate.estimatedDaysJa}
+                </p>
               </div>
-              <span style={{ fontSize: '14px', fontWeight: 600 }}>
-                {rate.price === 0 ? 'Free' : `¥${rate.price}`}
+              <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text)', flexShrink: 0, marginLeft: '12px' }}>
+                {rate.price === 0 ? '無料' : `¥${rate.price.toLocaleString()}`}
               </span>
             </button>
           ))}
@@ -179,25 +183,42 @@ export default function CheckoutPayment({ details, shippingRates, selectedRate, 
       )}
 
       {/* Order summary */}
-      <div style={{ background: 'var(--surface-low)', padding: '16px', marginBottom: '28px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-          <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Subtotal</span>
-          <span style={{ fontSize: '13px' }}>¥{subtotal.toLocaleString()}</span>
+      <div style={{
+        background: 'var(--surface-low)', padding: '16px',
+        border: '1px solid var(--border-light)', marginBottom: '24px',
+      }}>
+        <div style={{ marginBottom: '8px' }}>
+          <p style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '6px', letterSpacing: '0.05em' }}>
+            お届け先
+          </p>
+          <p style={{ fontSize: '12px', color: 'var(--text)', lineHeight: 1.6 }}>
+            {details.fullName}<br />{details.fullAddress}
+          </p>
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-          <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Shipping</span>
-          <span style={{ fontSize: '13px' }}>{selectedRate ? (selectedRate.price === 0 ? 'Free' : `¥${selectedRate.price}`) : '—'}</span>
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--border)', paddingTop: '10px' }}>
-          <span style={{ fontSize: '14px', fontWeight: 700 }}>Total</span>
-          <span style={{ fontFamily: 'var(--font-serif)', fontSize: '18px', fontWeight: 700 }}>¥{total.toLocaleString()}</span>
+        <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: '10px', marginTop: '10px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>小計</span>
+            <span style={{ fontSize: '13px', color: 'var(--text)' }}>¥{subtotal.toLocaleString()}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>送料</span>
+            <span style={{ fontSize: '13px', color: 'var(--text)' }}>
+              {selectedRate ? (selectedRate.price === 0 ? '無料' : `¥${selectedRate.price.toLocaleString()}`) : '—'}
+            </span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--border)', paddingTop: '10px' }}>
+            <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text)' }}>合計</span>
+            <span style={{ fontFamily: 'var(--font-serif)', fontSize: '18px', fontWeight: 700, color: 'var(--text)' }}>
+              ¥{total.toLocaleString()}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Payment tabs */}
+      {/* Payment method tabs */}
       <div style={{ display: 'flex', marginBottom: '20px', borderBottom: '1px solid var(--border-light)' }}>
-        <button style={tabBtn(method === 'card')} onClick={() => setMethod('card')}>Card</button>
-        <button style={tabBtn(method === 'paypal')} onClick={() => setMethod('paypal')}>PayPal</button>
+        <button style={tabStyle(method === 'card')} onClick={() => setMethod('card')}>クレジットカード</button>
+        <button style={tabStyle(method === 'paypal')} onClick={() => setMethod('paypal')}>PayPal</button>
       </div>
 
       {method === 'card' && (
@@ -207,9 +228,12 @@ export default function CheckoutPayment({ details, shippingRates, selectedRate, 
           </Elements>
         ) : (
           <div style={{ padding: '20px', border: '1px dashed var(--border)', textAlign: 'center' }}>
-            <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '8px' }}>Stripe not configured.</p>
-            <p style={{ fontSize: '11px', color: 'var(--primary)', lineHeight: 1.6 }}>
-              Add <code>NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</code> + <code>STRIPE_SECRET_KEY</code> to <code>.env.local</code>
+            <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '8px' }}>
+              Stripeの設定が必要です
+            </p>
+            <p style={{ fontSize: '11px', color: 'var(--accent)', lineHeight: 1.6 }}>
+              <code>NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</code> と <code>STRIPE_SECRET_KEY</code> を<br />
+              <code>.env.local</code> に設定してください
             </p>
           </div>
         )
@@ -223,18 +247,20 @@ export default function CheckoutPayment({ details, shippingRates, selectedRate, 
               intent: 'CAPTURE',
               purchase_units: [{
                 amount: { currency_code: 'JPY', value: String(total) },
-                description: 'Kokubo Coffee Order',
+                description: 'the;kokubo coffee order',
                 shipping: {
-                  name: { full_name: `${details.firstName} ${details.lastName}` },
+                  name: { full_name: details.fullName },
                   address: {
-                    address_line_1: details.address1, address_line_2: details.address2,
-                    admin_area_2: details.city, admin_area_1: details.state,
-                    postal_code: details.postcode, country_code: details.country,
+                    address_line_1: details.fullAddress,
+                    postal_code: details.postcode,
+                    country_code: details.country,
                   },
                 },
               }],
             })}
-            onApprove={async (_d, actions) => { if (actions.order) { await actions.order.capture(); onConfirmed(); } }}
+            onApprove={async (_d, actions) => {
+              if (actions.order) { await actions.order.capture(); onConfirmed(); }
+            }}
           />
         </PayPalScriptProvider>
       )}
