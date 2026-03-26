@@ -43,3 +43,7 @@ button { cursor: pointer; }
 input, select, textarea {
   font-family: system-ui, 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
 }
+
+/* Wheel picker: hide scrollbar */
+.wheel-scroll::-webkit-scrollbar { display: none; }
+.wheel-scroll { -ms-overflow-style: none; scrollbar-width: none; }
