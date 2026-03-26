@@ -117,7 +117,7 @@ export default function WheelPicker<T extends string>({
               }}
             >
               <span style={{
-                fontSize: selected ? '15px' : '13px',
+                fontSize: selected ? '18px' : '14px',
                 fontWeight: selected ? 700 : 400,
                 color: selected ? 'var(--text)' : 'var(--text-muted)',
                 letterSpacing: '0.04em',
@@ -128,10 +128,10 @@ export default function WheelPicker<T extends string>({
               </span>
               {opt.sublabel && (
                 <span style={{
-                  fontSize: '10px',
+                  fontSize: '11px',
                   color: 'var(--text-muted)',
-                  opacity: selected ? 0.65 : 0.3,
-                  marginTop: '1px',
+                  opacity: selected ? 0.7 : 0.3,
+                  marginTop: '2px',
                   letterSpacing: '0.03em',
                 }}>
                   {opt.sublabel}

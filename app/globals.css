@@ -17,7 +17,16 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  scroll-snap-type: y proximity;
+}
+
+/* Each product card snaps into the top of the viewport */
+.product-card-snap {
+  scroll-snap-align: start;
+  scroll-margin-top: 56px; /* header height */
+}
 
 body {
   background-color: var(--background);

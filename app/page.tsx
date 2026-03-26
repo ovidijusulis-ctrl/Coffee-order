@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { COFFEES } from './lib/products';
 import ProductCard from './components/ProductCard';
@@ -8,6 +9,8 @@ import { useCart } from './lib/cart';
 
 export default function HomePage() {
   const { totalItems, subtotal } = useCart();
+  const [focusedId, setFocusedId] = useState<string>(COFFEES[0].id);
+  const handleFocus = useCallback((id: string) => setFocusedId(id), []);
 
   return (
     <>
@@ -78,7 +81,13 @@ export default function HomePage() {
         {/* Coffee list */}
         <section style={{ paddingTop: '4px' }}>
           {COFFEES.map((product, i) => (
-            <ProductCard key={product.id} product={product} index={i} />
+            <ProductCard
+              key={product.id}
+              product={product}
+              index={i}
+              focused={focusedId === product.id}
+              onFocus={handleFocus}
+            />
           ))}
         </section>
 
