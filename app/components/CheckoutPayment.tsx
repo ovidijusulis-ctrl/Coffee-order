@@ -83,18 +83,19 @@ function StripeCardForm({
     setError(null);
 
     try {
-      // Create payment intent on the server
-      const res = await fetch('/api/create-payment-intent', {
+      // Create payment intent — requires the Next.js server (not available on GitHub Pages preview)
+      const apiBase = process.env.NEXT_PUBLIC_API_BASE || '';
+      const res = await fetch(`${apiBase}/api/create-payment-intent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: Math.round(total * 100), // in smallest currency unit
+          amount: Math.round(total * 100),
           currency: 'jpy',
           email: shipping.email,
         }),
       });
 
-      if (!res.ok) throw new Error('Failed to create payment intent');
+      if (!res.ok) throw new Error('Payment server not available. Deploy to Vercel or a Node.js host to enable live payments.');
       const { clientSecret } = await res.json();
 
       const cardNumber = elements.getElement(CardNumberElement);
