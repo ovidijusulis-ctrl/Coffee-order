@@ -1,47 +1,41 @@
 @import "tailwindcss";
 
 :root {
-  --cream: #f7f3ee;
-  --cream-dark: #ede7de;
-  --brown-light: #c8a882;
-  --brown: #8b5e3c;
-  --brown-dark: #3d2b1f;
-  --espresso: #1a0f0a;
-  --text: #2c1a0e;
-  --text-muted: #7a5c44;
-  --border: #d6c8b8;
-  --background: var(--cream);
-  --foreground: var(--text);
+  --background: #f9f9f9;
+  --surface: #f9f9f9;
+  --surface-low: #f4f3f3;
+  --surface-container: #eeeeee;
+  --surface-high: #e8e8e8;
+  --surface-highest: #e2e2e2;
+  --primary: #000000;
+  --on-primary: #ffffff;
+  --text: #1a1c1c;
+  --text-muted: #49464a;
+  --border: #cbc5ca;
+  --border-light: #e2e2e2;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
 body {
-  background-color: var(--cream);
+  background-color: var(--background);
   color: var(--text);
-  font-family: 'Georgia', 'Times New Roman', serif;
+  font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
 }
 
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: var(--cream-dark);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--brown-light);
-  border-radius: 3px;
+/* Font variables referenced throughout via style props */
+:root {
+  --font-serif: 'Noto Serif', Georgia, serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
 }
 
-input:focus,
-select:focus,
-textarea:focus {
-  outline: none;
-}
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+input:focus, select:focus, textarea:focus { outline: none; }
+button { cursor: pointer; }

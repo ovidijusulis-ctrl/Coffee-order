@@ -1,271 +1,186 @@
 'use client';
 
 import { useState } from 'react';
-import { Product, GRIND_LABELS, WEIGHT_LABELS, GrindOption, WeightOption } from '../lib/products';
+import { Product, GrindOption, WeightOption, GRIND_LABELS, GRIND_SUBLABELS, WEIGHT_LABELS } from '../lib/products';
 import { useCart } from '../lib/cart';
 
-const ROAST_COLORS: Record<string, string> = {
-  light: '#d4a853',
-  medium: '#8b5e3c',
-  dark: '#2c1a0e',
-};
+const ROAST_DESCRIPTIONS = ['Light', 'Light–Med', 'Medium', 'Med–Dark', 'Dark'];
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({ product, index }: { product: Product; index: number }) {
   const { addItem } = useCart();
-  const [selectedWeight, setSelectedWeight] = useState<WeightOption>(
-    product.category === 'beans' ? '250g' : '250g'
-  );
-  const [selectedGrind, setSelectedGrind] = useState<GrindOption | null>(
-    product.grindOptions ? 'whole-bean' : null
-  );
+  const [open, setOpen] = useState(false);
+  const [weight, setWeight] = useState<WeightOption>('250g');
+  const [grind, setGrind] = useState<GrindOption>('whole-bean');
   const [added, setAdded] = useState(false);
-  const [expanded, setExpanded] = useState(false);
 
-  const isMerchandise = product.category === 'merchandise';
-  const price = product.price[selectedWeight];
+  const weights: WeightOption[] = ['100g', '250g', '500g', '1kg'];
 
   function handleAdd() {
-    addItem({
-      product,
-      weight: selectedWeight,
-      grind: selectedGrind,
-      quantity: 1,
-    });
+    addItem({ product, weight, grind, quantity: 1 });
     setAdded(true);
-    setTimeout(() => setAdded(false), 1800);
+    setTimeout(() => { setAdded(false); setOpen(false); }, 1200);
   }
 
   return (
-    <div
-      style={{
-        backgroundColor: 'var(--cream)',
-        border: '1px solid var(--border)',
-        borderRadius: '2px',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      {/* Image placeholder */}
-      <div
+    <article style={{ borderBottom: '1px solid var(--border-light)' }}>
+      {/* Collapsed row */}
+      <button
+        onClick={() => setOpen(o => !o)}
         style={{
-          width: '100%',
-          paddingTop: '100%',
-          position: 'relative',
-          backgroundColor: 'var(--cream-dark)',
-          overflow: 'hidden',
+          width: '100%', textAlign: 'left', background: 'none', border: 'none',
+          padding: '0',
         }}
       >
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'column',
-            gap: '8px',
-          }}
-        >
-          {/* Coffee bean icon */}
-          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-            <ellipse cx="24" cy="24" rx="16" ry="10" fill={ROAST_COLORS[product.roast] || '#8b5e3c'} opacity="0.3" />
-            <ellipse cx="24" cy="24" rx="14" ry="8" stroke={ROAST_COLORS[product.roast]} strokeWidth="1.5" fill="none" />
-            <path d="M24 16 Q28 24 24 32" stroke={ROAST_COLORS[product.roast]} strokeWidth="1.5" fill="none" />
-          </svg>
-          {product.category !== 'merchandise' && (
-            <span style={{ fontSize: '10px', color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-              {product.origin}
-            </span>
-          )}
-        </div>
-
-        {/* Roast badge */}
-        {product.category === 'beans' && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '12px',
-              left: '12px',
-              padding: '3px 8px',
-              backgroundColor: ROAST_COLORS[product.roast],
-              borderRadius: '1px',
-            }}
-          >
-            <span style={{ fontSize: '9px', color: 'var(--cream)', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
-              {product.roast} roast
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Content */}
-      <div style={{ padding: '20px', flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        {/* Name & origin */}
-        <div>
-          <h3
-            style={{
-              fontSize: '16px',
-              fontWeight: '600',
-              color: 'var(--espresso)',
-              fontFamily: 'Georgia, serif',
-              marginBottom: '2px',
-            }}
-          >
-            {product.name}
-          </h3>
-          {product.category === 'beans' && (
-            <span style={{ fontSize: '11px', color: 'var(--text-muted)', letterSpacing: '0.08em' }}>
-              {product.process} · {product.origin}
-            </span>
-          )}
-        </div>
-
-        {/* Tasting notes */}
-        {product.notes.length > 0 && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-            {product.notes.map(note => (
-              <span
-                key={note}
-                style={{
-                  fontSize: '10px',
-                  padding: '2px 7px',
-                  border: '1px solid var(--border)',
-                  borderRadius: '1px',
-                  color: 'var(--text-muted)',
-                  letterSpacing: '0.05em',
-                }}
-              >
-                {note}
-              </span>
-            ))}
-          </div>
-        )}
-
-        {/* Expand description */}
-        <button
-          onClick={() => setExpanded(!expanded)}
-          style={{
-            background: 'none',
-            border: 'none',
-            padding: 0,
-            cursor: 'pointer',
-            textAlign: 'left',
-          }}
-        >
-          <p
-            style={{
-              fontSize: '13px',
-              color: 'var(--text-muted)',
-              lineHeight: 1.6,
-              overflow: 'hidden',
-              maxHeight: expanded ? '200px' : '40px',
-              transition: 'max-height 0.3s ease',
-            }}
-          >
-            {product.description}
-          </p>
-          <span style={{ fontSize: '11px', color: 'var(--brown)', letterSpacing: '0.08em' }}>
-            {expanded ? 'Less ↑' : 'More ↓'}
+        <div style={{ display: 'flex', gap: '16px', padding: '24px 0', alignItems: 'flex-start' }}>
+          {/* Number */}
+          <span style={{
+            fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: '13px',
+            color: 'var(--text-muted)', minWidth: '24px', paddingTop: '4px',
+          }}>
+            {String(index + 1).padStart(2, '0')}
           </span>
-        </button>
 
-        <div style={{ flex: 1 }} />
+          {/* Text */}
+          <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginBottom: '6px', flexWrap: 'wrap' }}>
+              <h2 style={{
+                fontFamily: 'var(--font-serif)', fontStyle: 'italic',
+                fontSize: '24px', fontWeight: 400, color: 'var(--primary)', lineHeight: 1,
+              }}>
+                {product.name}
+              </h2>
+              <span style={{
+                fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.15em',
+                color: 'var(--text-muted)', fontFamily: 'var(--font-sans)',
+              }}>
+                {product.origin}
+              </span>
+            </div>
 
-        {/* Weight selector (only for beans) */}
-        {!isMerchandise && (
-          <div>
-            <p style={{ fontSize: '10px', color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '6px' }}>
-              Size
+            {/* Notes */}
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
+              {product.notes.map(n => (
+                <span key={n} style={{
+                  fontSize: '10px', padding: '2px 8px',
+                  background: 'var(--surface-container)',
+                  color: 'var(--text-muted)', letterSpacing: '0.04em',
+                }}>
+                  {n}
+                </span>
+              ))}
+            </div>
+
+            {/* Roast bar */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              {[1,2,3,4,5].map(i => (
+                <div key={i} style={{
+                  height: '3px', width: '20px',
+                  background: i <= product.roast ? 'var(--primary)' : 'var(--border)',
+                }} />
+              ))}
+              <span style={{ fontSize: '10px', color: 'var(--text-muted)', marginLeft: '4px', fontStyle: 'italic' }}>
+                {product.roastLabel}
+              </span>
+            </div>
+          </div>
+
+          {/* Price + toggle */}
+          <div style={{ textAlign: 'right', flexShrink: 0 }}>
+            <p style={{
+              fontFamily: 'var(--font-serif)', fontSize: '16px', color: 'var(--primary)', marginBottom: '4px',
+            }}>
+              from ¥{product.price['100g']}
             </p>
-            <div style={{ display: 'flex', gap: '6px' }}>
-              {(['250g', '500g', '1kg'] as WeightOption[]).map(w => (
-                <button
-                  key={w}
-                  onClick={() => setSelectedWeight(w)}
-                  style={{
-                    flex: 1,
-                    padding: '6px',
-                    fontSize: '12px',
-                    border: `1px solid ${selectedWeight === w ? 'var(--brown)' : 'var(--border)'}`,
-                    backgroundColor: selectedWeight === w ? 'var(--brown)' : 'transparent',
-                    color: selectedWeight === w ? 'var(--cream)' : 'var(--text-muted)',
-                    borderRadius: '1px',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s',
-                    letterSpacing: '0.05em',
-                  }}
-                >
+            <span style={{
+              fontSize: '11px', color: 'var(--text-muted)',
+              display: 'inline-block', transform: open ? 'rotate(180deg)' : 'none',
+              transition: 'transform 0.2s', lineHeight: 1,
+            }}>
+              ▾
+            </span>
+          </div>
+        </div>
+      </button>
+
+      {/* Expanded selector */}
+      {open && (
+        <div style={{ paddingBottom: '28px', paddingLeft: '40px' }}>
+          {/* Weight */}
+          <div style={{ marginBottom: '24px' }}>
+            <p style={{
+              fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.2em',
+              fontWeight: 600, marginBottom: '12px', color: 'var(--text)',
+            }}>
+              Select Weight
+            </p>
+            <div style={{ display: 'flex', gap: '0' }}>
+              {weights.map(w => (
+                <button key={w} onClick={() => setWeight(w)} style={{
+                  flex: 1, padding: '14px 0', background: 'none', border: 'none',
+                  borderBottom: `2px solid ${weight === w ? 'var(--primary)' : 'var(--border-light)'}`,
+                  color: weight === w ? 'var(--primary)' : 'var(--text-muted)',
+                  fontSize: '12px', fontWeight: weight === w ? 600 : 400,
+                  letterSpacing: '0.05em', transition: 'all 0.15s',
+                }}>
                   {WEIGHT_LABELS[w]}
+                  <br />
+                  <span style={{ fontSize: '11px', fontWeight: 400 }}>¥{product.price[w]}</span>
                 </button>
               ))}
             </div>
           </div>
-        )}
 
-        {/* Grind selector */}
-        {product.grindOptions && product.grindOptions.length > 0 && (
-          <div>
-            <p style={{ fontSize: '10px', color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '6px' }}>
+          {/* Grind */}
+          <div style={{ marginBottom: '24px' }}>
+            <p style={{
+              fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.2em',
+              fontWeight: 600, marginBottom: '12px', color: 'var(--text)',
+            }}>
               Grind
             </p>
-            <select
-              value={selectedGrind || ''}
-              onChange={e => setSelectedGrind(e.target.value as GrindOption)}
-              style={{
-                width: '100%',
-                padding: '8px 10px',
-                fontSize: '13px',
-                border: '1px solid var(--border)',
-                borderRadius: '1px',
-                backgroundColor: 'var(--cream)',
-                color: 'var(--text)',
-                cursor: 'pointer',
-                appearance: 'none',
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238b5e3c' strokeWidth='1.5' fill='none'/%3E%3C/svg%3E")`,
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'right 10px center',
-              }}
-            >
-              {product.grindOptions.map(g => (
-                <option key={g} value={g}>{GRIND_LABELS[g]}</option>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+              {(product.grindOptions || []).map(g => (
+                <button key={g} onClick={() => setGrind(g)} style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '12px 14px',
+                  background: grind === g ? 'var(--primary)' : 'var(--surface-low)',
+                  border: 'none',
+                  color: grind === g ? 'var(--on-primary)' : 'var(--text)',
+                  textAlign: 'left', transition: 'all 0.15s',
+                }}>
+                  <div>
+                    <p style={{ fontSize: '12px', fontWeight: 600, marginBottom: '1px' }}>{GRIND_LABELS[g]}</p>
+                    <p style={{ fontSize: '10px', opacity: grind === g ? 0.6 : 0.5 }}>{GRIND_SUBLABELS[g]}</p>
+                  </div>
+                  <span style={{ fontSize: '16px', opacity: grind === g ? 1 : 0.2 }}>
+                    {grind === g ? '●' : '○'}
+                  </span>
+                </button>
               ))}
-            </select>
+            </div>
           </div>
-        )}
 
-        {/* Price & Add to cart */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '4px' }}>
-          <span
-            style={{
-              fontSize: '18px',
-              fontWeight: '600',
-              color: 'var(--espresso)',
-              fontFamily: 'Georgia, serif',
-            }}
-          >
-            ¥{price.toLocaleString()}
-          </span>
-          <button
-            onClick={handleAdd}
-            style={{
-              padding: '10px 20px',
-              fontSize: '12px',
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              backgroundColor: added ? 'var(--brown-dark)' : 'var(--espresso)',
-              color: 'var(--cream)',
-              border: 'none',
-              borderRadius: '1px',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s',
-              minWidth: '110px',
-            }}
-          >
-            {added ? '✓ Added' : 'Add to Cart'}
+          {/* CTA */}
+          <button onClick={handleAdd} style={{
+            width: '100%', padding: '18px',
+            background: added ? '#333' : 'var(--primary)',
+            color: 'var(--on-primary)', border: 'none',
+            fontSize: '12px', fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase',
+            transition: 'background 0.2s',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+          }}>
+            {added ? (
+              <><span>✓</span> Added to Cart</>
+            ) : (
+              <><span style={{ fontSize: '16px' }}>🛍</span> Add to Cart — ¥{product.price[weight]}</>
+            )}
           </button>
+
+          <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '10px', fontStyle: 'italic' }}>
+            {product.description}
+          </p>
         </div>
-      </div>
-    </div>
+      )}
+    </article>
   );
 }

@@ -1,140 +1,137 @@
 export type GrindOption = 'whole-bean' | 'espresso' | 'filter' | 'french-press' | 'aeropress';
-export type WeightOption = '250g' | '500g' | '1kg';
+export type WeightOption = '100g' | '250g' | '500g' | '1kg';
 
 export interface Product {
   id: string;
   name: string;
   origin: string;
-  description: string;
+  region: string;
   notes: string[];
   process: string;
-  roast: 'light' | 'medium' | 'dark';
+  roast: 1 | 2 | 3 | 4 | 5; // 1=light, 5=dark (out of 5)
+  roastLabel: string;
   price: Record<WeightOption, number>;
-  image: string;
-  category: 'beans' | 'merchandise' | 'equipment';
+  category: 'beans' | 'merchandise';
   grindOptions?: GrindOption[];
-  featured?: boolean;
+  description: string;
 }
 
-export const PRODUCTS: Product[] = [
+export interface RelatedItem {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+}
+
+export const COFFEES: Product[] = [
   {
     id: 'ethiopia-yirgacheffe',
-    name: 'Ethiopia Yirgacheffe',
+    name: 'Yirgacheffe',
     origin: 'Ethiopia',
-    description: 'A bright and floral single origin from the birthplace of coffee. Grown at high altitude, washed and dried on raised beds.',
-    notes: ['Jasmine', 'Bergamot', 'Peach', 'Lemon Zest'],
+    region: 'Gedeo Zone',
+    notes: ['Jasmine', 'Bergamot', 'Peach'],
     process: 'Washed',
-    roast: 'light',
-    price: { '250g': 18, '500g': 32, '1kg': 58 },
-    image: '/images/ethiopia.jpg',
-    category: 'beans',
-    grindOptions: ['whole-bean', 'espresso', 'filter', 'french-press', 'aeropress'],
-    featured: true,
-  },
-  {
-    id: 'colombia-huila',
-    name: 'Colombia Huila',
-    origin: 'Colombia',
-    description: 'Rich and chocolatey with a smooth body. Grown by small family farms in the Huila department alongside fruit trees.',
-    notes: ['Dark Chocolate', 'Caramel', 'Red Apple', 'Brown Sugar'],
-    process: 'Washed',
-    roast: 'medium',
-    price: { '250g': 16, '500g': 28, '1kg': 50 },
-    image: '/images/colombia.jpg',
-    category: 'beans',
-    grindOptions: ['whole-bean', 'espresso', 'filter', 'french-press', 'aeropress'],
-    featured: true,
+    roast: 1,
+    roastLabel: 'Light',
+    price: { '100g': 10, '250g': 22, '500g': 38, '1kg': 68 },
+    category: 'beans' as const, grindOptions: ['whole-bean', 'espresso', 'filter', 'french-press', 'aeropress'],
+    description: 'Bright and floral, grown at altitude in the birthplace of coffee.',
   },
   {
     id: 'kenya-aa',
     name: 'Kenya AA',
     origin: 'Kenya',
-    description: 'Complex and wine-like with a bold, juicy body. Double-washed using the traditional Kenyan method for exceptional clarity.',
-    notes: ['Blackcurrant', 'Tomato', 'Dark Berry', 'Citrus Peel'],
+    region: 'Kirinyaga County',
+    notes: ['Blackcurrant', 'Tomato', 'Dark Berry'],
     process: 'Double Washed',
-    roast: 'medium',
-    price: { '250g': 20, '500g': 36, '1kg': 64 },
-    image: '/images/kenya.jpg',
-    category: 'beans',
-    grindOptions: ['whole-bean', 'espresso', 'filter', 'french-press', 'aeropress'],
-    featured: true,
+    roast: 2,
+    roastLabel: 'Light–Medium',
+    price: { '100g': 11, '250g': 24, '500g': 42, '1kg': 75 },
+    category: 'beans' as const, grindOptions: ['whole-bean', 'espresso', 'filter', 'french-press', 'aeropress'],
+    description: 'Complex and wine-like with a bold, juicy body and exceptional clarity.',
+  },
+  {
+    id: 'colombia-huila',
+    name: 'Huila',
+    origin: 'Colombia',
+    region: 'Huila Department',
+    notes: ['Dark Chocolate', 'Caramel', 'Red Apple'],
+    process: 'Washed',
+    roast: 2,
+    roastLabel: 'Medium',
+    price: { '100g': 9, '250g': 20, '500g': 35, '1kg': 62 },
+    category: 'beans' as const, grindOptions: ['whole-bean', 'espresso', 'filter', 'french-press', 'aeropress'],
+    description: 'Rich and chocolatey from small family farms alongside fruit trees.',
   },
   {
     id: 'guatemala-antigua',
-    name: 'Guatemala Antigua',
+    name: 'Antigua',
     origin: 'Guatemala',
-    description: 'A classic Central American coffee with full body and gentle sweetness. Grown in volcanic soil at 1,500m elevation.',
-    notes: ['Milk Chocolate', 'Walnut', 'Honey', 'Spice'],
+    region: 'Sacatepéquez',
+    notes: ['Milk Chocolate', 'Walnut', 'Honey'],
     process: 'Washed',
-    roast: 'medium',
-    price: { '250g': 15, '500g': 26, '1kg': 46 },
-    image: '/images/guatemala.jpg',
-    category: 'beans',
-    grindOptions: ['whole-bean', 'espresso', 'filter', 'french-press', 'aeropress'],
-  },
-  {
-    id: 'sumatra-mandheling',
-    name: 'Sumatra Mandheling',
-    origin: 'Indonesia',
-    description: 'Bold and earthy with a heavy syrupy body. Wet-hulled using the traditional Giling Basah method unique to Sumatra.',
-    notes: ['Dark Chocolate', 'Cedar', 'Tobacco', 'Earth'],
-    process: 'Wet Hulled',
-    roast: 'dark',
-    price: { '250g': 16, '500g': 28, '1kg': 50 },
-    image: '/images/sumatra.jpg',
-    category: 'beans',
-    grindOptions: ['whole-bean', 'espresso', 'filter', 'french-press', 'aeropress'],
+    roast: 3,
+    roastLabel: 'Medium',
+    price: { '100g': 9, '250g': 19, '500g': 33, '1kg': 58 },
+    category: 'beans' as const, grindOptions: ['whole-bean', 'espresso', 'filter', 'french-press', 'aeropress'],
+    description: 'Full-bodied sweetness grown in volcanic soil at 1,500m.',
   },
   {
     id: 'espresso-blend',
-    name: 'House Espresso Blend',
+    name: 'House Espresso',
     origin: 'Brazil & Colombia',
-    description: 'Our signature espresso blend. Balanced, sweet, and consistent — crafted for milk-based drinks and straight shots alike.',
-    notes: ['Hazelnut', 'Caramel', 'Dark Chocolate', 'Orange Peel'],
+    region: 'House Blend',
+    notes: ['Hazelnut', 'Caramel', 'Orange Peel'],
     process: 'Blend',
-    roast: 'medium',
-    price: { '250g': 15, '500g': 26, '1kg': 46 },
-    image: '/images/espresso-blend.jpg',
-    category: 'beans',
-    grindOptions: ['whole-bean', 'espresso', 'filter', 'french-press', 'aeropress'],
-    featured: true,
+    roast: 3,
+    roastLabel: 'Medium–Dark',
+    price: { '100g': 8, '250g': 18, '500g': 30, '1kg': 54 },
+    category: 'beans' as const, grindOptions: ['whole-bean', 'espresso', 'filter', 'french-press', 'aeropress'],
+    description: 'Our signature blend. Sweet and consistent for milk drinks and straight shots.',
   },
   {
-    id: 'ceramic-cup',
-    name: 'Kokubo Ceramic Cup',
-    origin: 'Handmade',
-    description: 'Hand-thrown ceramic cup with a natural glaze finish. Each piece is unique. Holds 250ml.',
-    notes: [],
-    process: '',
-    roast: 'light',
-    price: { '250g': 28, '500g': 28, '1kg': 28 },
-    image: '/images/ceramic-cup.jpg',
-    category: 'merchandise',
+    id: 'sumatra-mandheling',
+    name: 'Mandheling',
+    origin: 'Sumatra',
+    region: 'North Sumatra',
+    notes: ['Dark Chocolate', 'Cedar', 'Earth'],
+    process: 'Wet Hulled',
+    roast: 4,
+    roastLabel: 'Dark',
+    price: { '100g': 9, '250g': 20, '500g': 34, '1kg': 60 },
+    category: 'beans' as const, grindOptions: ['whole-bean', 'espresso', 'filter', 'french-press', 'aeropress'],
+    description: 'Bold and earthy with a heavy syrupy body. Wet-hulled in the Giling Basah tradition.',
   },
-  {
-    id: 'tote-bag',
-    name: 'Kokubo Canvas Tote',
-    origin: 'Organic Cotton',
-    description: 'Heavy-duty canvas tote with the Kokubo mark. Carries your coffee and your values.',
-    notes: [],
-    process: '',
-    roast: 'light',
-    price: { '250g': 22, '500g': 22, '1kg': 22 },
-    image: '/images/tote-bag.jpg',
-    category: 'merchandise',
-  },
+];
+
+export const RELATED_ITEMS: RelatedItem[] = [
+  { id: 'drip-bag-5pk', name: 'Drip Bag Pack', description: 'Single-serve pour-over bags. 5 pack.', price: 12, category: 'Brewing' },
+  { id: 'ceramic-cup', name: 'Ceramic Cup', description: 'Hand-thrown, 250ml.', price: 28, category: 'Goods' },
+  { id: 'tote-bag', name: 'Canvas Tote', description: 'Heavy-duty organic cotton.', price: 22, category: 'Goods' },
+  { id: 'coffee-canister', name: 'Storage Canister', description: 'Airtight, UV-blocking glass.', price: 35, category: 'Brewing' },
+  { id: 'subscription-250g', name: 'Monthly Sub — 250g', description: 'Our pick, roasted fresh, monthly.', price: 20, category: 'Subscription' },
 ];
 
 export const GRIND_LABELS: Record<GrindOption, string> = {
   'whole-bean': 'Whole Bean',
   'espresso': 'Espresso',
-  'filter': 'Filter / Pour Over',
+  'filter': 'Drip / Filter',
   'french-press': 'French Press',
   'aeropress': 'AeroPress',
 };
 
+export const GRIND_SUBLABELS: Record<GrindOption, string> = {
+  'whole-bean': 'Maximum freshness',
+  'espresso': 'Fine grind',
+  'filter': 'Medium grind',
+  'french-press': 'Coarse grind',
+  'aeropress': 'Medium-fine',
+};
+
 export const WEIGHT_LABELS: Record<WeightOption, string> = {
-  '250g': '250g',
-  '500g': '500g',
-  '1kg': '1kg',
+  '100g': '100G',
+  '250g': '250G',
+  '500g': '500G',
+  '1kg': '1KG',
 };

@@ -1,28 +1,31 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { CartProvider } from './lib/cart';
-import Header from './components/Header';
 
 export const metadata: Metadata = {
   title: 'Kokubo Coffee — Order Fresh Roasted Beans',
-  description:
-    'Single origin, small batch specialty coffee roasted to order. Order online with local delivery and worldwide shipping.',
+  description: 'Single origin, small batch specialty coffee roasted to order. Local delivery and worldwide shipping.',
   openGraph: {
-    title: 'Kokubo Coffee Roasters',
+    title: 'Kokubo Coffee',
     description: 'Freshly roasted specialty coffee delivered to your door.',
     type: 'website',
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body>
         <CartProvider>
-          <Header />
-          <main style={{ flex: 1 }}>{children}</main>
+          {children}
         </CartProvider>
       </body>
     </html>
