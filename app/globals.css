@@ -1,31 +1,43 @@
 @import "tailwindcss";
 
 :root {
-  --background: #2e2d2d;
-  --surface: #333232;
-  --surface-low: #3a3939;
-  --surface-container: #424141;
-  --surface-high: #4a4949;
-  --surface-highest: #535252;
-  --primary: #f0efef;
-  --on-primary: #1a1a1a;
-  --text: #f0efef;
-  --text-muted: #9e9b9b;
-  --border: #4e4d4d;
-  --border-light: #3d3c3c;
-  --accent: #c8b99a;
+  /* Shop palette — dark matte, rust steel, volcanic stone, amber light */
+  --background: #191716;
+  --surface: #201f1d;
+  --surface-low: #1a1917;
+  --surface-container: #272523;
+  --surface-high: #2f2d2b;
+  --surface-highest: #383532;
+
+  --primary: #e8e0d5;       /* warm cream */
+  --on-primary: #191716;
+
+  --text: #e8e0d5;
+  --text-muted: #7a746c;
+  --text-dim: #4a4540;
+
+  --border: #332f2c;
+  --border-light: #252220;
+
+  --rust: #b55a32;          /* oxidised steel */
+  --amber: #c8951a;         /* Edison bulb */
+  --stone: #6b6560;         /* volcanic rock */
+  --accent: #b55a32;        /* alias */
+
+  --font-serif: 'Noto Serif', 'Noto Serif JP', Georgia, serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
 }
 
 * { box-sizing: border-box; }
+
 html {
   scroll-behavior: smooth;
   scroll-snap-type: y proximity;
 }
 
-/* Each product card snaps into the top of the viewport */
 .product-card-snap {
   scroll-snap-align: start;
-  scroll-margin-top: 56px; /* header height */
+  scroll-margin-top: 56px;
 }
 
 body {
@@ -36,23 +48,25 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-:root {
-  --font-serif: 'Noto Serif', 'Noto Serif JP', Georgia, serif;
-  --font-sans: 'Inter', system-ui, sans-serif;
-}
-
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-input:focus, select:focus, textarea:focus { outline: none; }
-button { cursor: pointer; }
-
-/* Japanese input fields */
 input, select, textarea {
   font-family: system-ui, 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
 }
 
-/* Wheel picker: hide scrollbar */
+/* Wheel picker — hide scrollbar */
 .wheel-scroll::-webkit-scrollbar { display: none; }
 .wheel-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Ripple rings animation */
+@keyframes ripple {
+  0%   { transform: scale(0.4); opacity: 0.5; }
+  100% { transform: scale(2.8); opacity: 0; }
+}
+.ripple-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid var(--rust);
+  pointer-events: none;
+  animation: ripple 2.4s ease-out infinite;
+}
+.ripple-ring:nth-child(2) { animation-delay: 0.8s; }
+.ripple-ring:nth-child(3) { animation-delay: 1.6s; }

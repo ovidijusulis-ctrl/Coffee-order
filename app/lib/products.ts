@@ -1,10 +1,19 @@
 export type GrindOption = 'whole-bean' | 'espresso' | 'filter' | 'french-press' | 'aeropress';
 export type WeightOption = '100g' | '250g' | '500g' | '1kg';
 
+export interface FlavorProfile {
+  acidity: number;    // 酸味
+  sweetness: number;  // 甘み
+  body: number;       // コク
+  bitterness: number; // 苦味
+  aroma: number;      // 香り
+  aftertaste: number; // 余韻
+}
+
 export interface Product {
   id: string;
-  name: string;          // e.g. "ETHIOPIA"
-  nameJa: string;        // e.g. "エチオピア"
+  name: string;
+  nameJa: string;
   origin: string;
   region: string;
   notes: string[];
@@ -18,6 +27,7 @@ export interface Product {
   category: 'beans' | 'merchandise';
   grindOptions?: GrindOption[];
   descriptionJa: string;
+  flavor: FlavorProfile;
 }
 
 export interface RelatedItem {
@@ -43,9 +53,10 @@ export const COFFEES: Product[] = [
     roastLabel: 'Light',
     roastLabelJa: 'ライト',
     price: { '100g': 1200, '250g': 2600, '500g': 4800, '1kg': 8800 },
-    category: 'beans' as const,
+    category: 'beans',
     grindOptions: ['whole-bean', 'espresso', 'filter', 'french-press', 'aeropress'],
     descriptionJa: 'コーヒー発祥の地から。高地で栽培された豆は華やかな花香とフルーティーな酸味が特徴です。',
+    flavor: { acidity: 5, sweetness: 4, body: 2, bitterness: 1, aroma: 5, aftertaste: 4 },
   },
   {
     id: 'kenya',
@@ -61,9 +72,10 @@ export const COFFEES: Product[] = [
     roastLabel: 'Light–Medium',
     roastLabelJa: 'ライト〜ミディアム',
     price: { '100g': 1400, '250g': 3000, '500g': 5500, '1kg': 10000 },
-    category: 'beans' as const,
+    category: 'beans',
     grindOptions: ['whole-bean', 'espresso', 'filter', 'french-press', 'aeropress'],
     descriptionJa: 'ワインのような複雑さと力強いボディ。ケニア伝統のダブルウォッシュで透明感ある一杯に。',
+    flavor: { acidity: 4, sweetness: 3, body: 4, bitterness: 2, aroma: 4, aftertaste: 5 },
   },
   {
     id: 'india',
@@ -79,9 +91,10 @@ export const COFFEES: Product[] = [
     roastLabel: 'Medium',
     roastLabelJa: 'ミディアム',
     price: { '100g': 1000, '250g': 2200, '500g': 4000, '1kg': 7200 },
-    category: 'beans' as const,
+    category: 'beans',
     grindOptions: ['whole-bean', 'espresso', 'filter', 'french-press', 'aeropress'],
     descriptionJa: '南インドの農園から。チョコレートとスパイスの奥深い風味。エスプレッソにもおすすめです。',
+    flavor: { acidity: 2, sweetness: 3, body: 5, bitterness: 4, aroma: 3, aftertaste: 4 },
   },
   {
     id: 'nicaragua',
@@ -97,9 +110,10 @@ export const COFFEES: Product[] = [
     roastLabel: 'Medium',
     roastLabelJa: 'ミディアム',
     price: { '100g': 1300, '250g': 2800, '500g': 5000, '1kg': 9200 },
-    category: 'beans' as const,
+    category: 'beans',
     grindOptions: ['whole-bean', 'espresso', 'filter', 'french-press', 'aeropress'],
     descriptionJa: 'まろやかな甘みとナッツの余韻。日々のコーヒーに寄り添う、飲み飽きしない一杯。',
+    flavor: { acidity: 2, sweetness: 5, body: 3, bitterness: 2, aroma: 4, aftertaste: 3 },
   },
   {
     id: 'guatemala',
@@ -115,9 +129,10 @@ export const COFFEES: Product[] = [
     roastLabel: 'Medium',
     roastLabelJa: 'ミディアム',
     price: { '100g': 1100, '250g': 2400, '500g': 4400, '1kg': 8000 },
-    category: 'beans' as const,
+    category: 'beans',
     grindOptions: ['whole-bean', 'espresso', 'filter', 'french-press', 'aeropress'],
     descriptionJa: '火山性土壌が育む豊かなコク。チョコレートのような甘さとはちみつの優しい後味。',
+    flavor: { acidity: 3, sweetness: 4, body: 4, bitterness: 3, aroma: 3, aftertaste: 4 },
   },
   {
     id: 'espresso-blend',
@@ -133,9 +148,10 @@ export const COFFEES: Product[] = [
     roastLabel: 'Medium–Dark',
     roastLabelJa: 'ミディアム〜ダーク',
     price: { '100g': 1000, '250g': 2200, '500g': 4000, '1kg': 7200 },
-    category: 'beans' as const,
+    category: 'beans',
     grindOptions: ['whole-bean', 'espresso', 'filter', 'french-press', 'aeropress'],
     descriptionJa: 'the;kokuboの定番ブレンド。エスプレッソにもドリップにも。毎日飲みたくなるバランス。',
+    flavor: { acidity: 2, sweetness: 4, body: 4, bitterness: 3, aroma: 3, aftertaste: 4 },
   },
 ];
 
@@ -149,14 +165,14 @@ export const RELATED_ITEMS: RelatedItem[] = [
 
 export const GRIND_LABELS_JA: Record<GrindOption, string> = {
   'whole-bean': '豆のまま',
-  'espresso': 'エスプレッソ用',
-  'filter': 'ドリップ用',
-  'french-press': 'フレンチプレス用',
-  'aeropress': 'エアロプレス用',
+  'espresso': 'エスプレッソ',
+  'filter': 'ドリップ',
+  'french-press': 'フレンチプレス',
+  'aeropress': 'エアロプレス',
 };
 
 export const GRIND_SUBLABELS_JA: Record<GrindOption, string> = {
-  'whole-bean': '鮮度を最大限に保つ',
+  'whole-bean': '鮮度最大',
   'espresso': '細挽き',
   'filter': '中挽き',
   'french-press': '粗挽き',
@@ -169,3 +185,12 @@ export const WEIGHT_LABELS: Record<WeightOption, string> = {
   '500g': '500g',
   '1kg': '1kg',
 };
+
+export const FLAVOR_AXES: { key: keyof FlavorProfile; label: string }[] = [
+  { key: 'acidity',    label: '酸味' },
+  { key: 'aroma',      label: '香り' },
+  { key: 'sweetness',  label: '甘み' },
+  { key: 'aftertaste', label: '余韻' },
+  { key: 'body',       label: 'コク' },
+  { key: 'bitterness', label: '苦味' },
+];
