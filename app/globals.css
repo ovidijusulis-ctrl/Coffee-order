@@ -32,13 +32,19 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-snap-type: y proximity;
 }
 
-.product-card-snap {
-  scroll-snap-align: start;
-  scroll-margin-top: 56px;
+/* Drum enter animations */
+@keyframes drumEnterUp {
+  from { transform: translateY(56px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
 }
+@keyframes drumEnterDown {
+  from { transform: translateY(-56px); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+.drum-enter-up   { animation: drumEnterUp   0.38s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.drum-enter-down { animation: drumEnterDown 0.38s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
 body {
   background-color: var(--background);
