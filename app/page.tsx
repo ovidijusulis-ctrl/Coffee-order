@@ -99,6 +99,44 @@ export default function Home() {
         onTouchEnd={onTouchEnd}
         onWheel={onWheel}
       >
+        {/* ── Background: grain + warm glow + bean watermark ── */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+          {/* Warm radial glow centred on chart */}
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'radial-gradient(ellipse 55% 45% at 50% 48%, rgba(177,90,50,0.09) 0%, rgba(200,149,26,0.03) 40%, transparent 70%)',
+          }} />
+
+          {/* Coffee bean outline watermark */}
+          <svg
+            viewBox="-115 -135 230 270"
+            style={{
+              position: 'absolute',
+              width: '380px', height: '380px',
+              top: '50%', left: '50%',
+              transform: 'translate(-50%, -52%) rotate(-18deg)',
+              opacity: 0.055,
+            }}
+          >
+            <path
+              d="M 0,-120 C 55,-120 92,-68 92,0 C 92,68 55,120 0,120 C -55,120 -92,68 -92,0 C -92,-68 -55,-120 0,-120 Z"
+              fill="none" stroke="var(--text)" strokeWidth="2.5"
+            />
+            <path
+              d="M 0,-120 C 30,-78 30,78 0,120"
+              fill="none" stroke="var(--text)" strokeWidth="1.8"
+            />
+          </svg>
+
+          {/* Film grain texture */}
+          <div style={{
+            position: 'absolute', inset: 0,
+            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23g)'/%3E%3C/svg%3E")`,
+            opacity: 0.04,
+            mixBlendMode: 'screen',
+          }} />
+        </div>
+
         {/* Prev ghost — top */}
         <button
           onClick={() => navigate(-1)}
@@ -125,7 +163,7 @@ export default function Home() {
             position: 'absolute', inset: '64px 0 64px 0',
             display: 'flex', flexDirection: 'column',
             alignItems: 'center', justifyContent: 'center',
-            padding: '0 32px', textAlign: 'center',
+            padding: '0 32px', textAlign: 'center', zIndex: 1,
           }}
         >
           {/* Side index bar */}
@@ -169,22 +207,9 @@ export default function Home() {
             {coffee.region}
           </p>
 
-          {/* Flavor chart + ripple */}
-          <div style={{ position: 'relative', marginBottom: '20px' }}>
-            <div style={{
-              position: 'absolute', inset: 0,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              pointerEvents: 'none',
-            }}>
-              <div style={{ position: 'relative', width: '170px', height: '170px' }}>
-                <div className="ripple-ring" style={{ position: 'absolute', inset: 0 }} />
-                <div className="ripple-ring" style={{ position: 'absolute', inset: 0 }} />
-                <div className="ripple-ring" style={{ position: 'absolute', inset: 0 }} />
-              </div>
-            </div>
-            <div style={{ position: 'relative', zIndex: 1 }}>
-              <FlavorChart flavor={coffee.flavor} size={200} animated />
-            </div>
+          {/* Flavor chart */}
+          <div style={{ marginBottom: '20px' }}>
+            <FlavorChart flavor={coffee.flavor} size={200} animated />
           </div>
 
           {/* Roast */}
